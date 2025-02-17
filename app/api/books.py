@@ -14,6 +14,19 @@ class BookService:
         self.db = db
 
     def create_book(self, book: BookCreate) -> Book:
+        '''
+        Creates a new book in the database.
+
+        Checks if a book with the same ISBN already exists in the database. If so, raises an HTTPException.
+        Commits the new book to the database and handles integrity errors related to unique ISBN.
+
+        Parameters:
+            book (BookCreate): The book data to be added to the database.
+
+        Returns:
+            Book: The newly created book object.
+        '''
+        
         existing_book = self.db.query(Book).filter(Book.isbn == book.isbn).first()
         if existing_book:
             raise HTTPException(status_code=400, detail="Book with this ISBN already exists.")
@@ -30,6 +43,16 @@ class BookService:
         return new_book
 
     def list_books(self, skip: int = 0, limit: int = 10) -> List[Book]:
+        '''
+        Retrieves a list of books from the database with pagination.
+
+        Parameters:
+            skip (int, optional): The number of books to skip for pagination. Defaults to 0.
+            limit (int, optional): The number of books to retrieve. Defaults to 10.
+
+        Returns:
+            List[Book]: A list of books retrieved from the database.
+        '''
         return self.db.query(Book).offset(skip).limit(limit).all()
 
 
